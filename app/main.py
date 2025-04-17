@@ -1,9 +1,7 @@
-from fastapi import FastAPI, HTTPException, Depends, Security, APIRouter
+from fastapi import FastAPI, HTTPException, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
-from typing import List, Optional
-from datetime import date
+
 from .schemas import *
-from .dependencies import TokenData, validate_token
 
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
@@ -26,7 +24,7 @@ hotels_data = {
         "amenities": ["Infinity Pool", "Sahana Spa", "Gymnasium", "Library", "Restaurant", "Room Service"],
         "policies": [
             "Check-in: 2:00 PM",
-            "Check-out: 12:00 PM", 
+            "Check-out: 12:00 PM",
             "No pets allowed",
             "Non-smoking rooms"
         ],
@@ -36,13 +34,13 @@ hotels_data = {
     2: {
         "name": "Gardeo Colombo Seven",
         "description": "Gardeo Colombo Seven is located in the heart of Colombo, the commercial capital of Sri Lanka and offers the discerning traveler contemporary accommodation and modern design aesthetic. Rising over the city landscape, the property boasts stunning views, a rooftop bar and pool, main restaurant, gym and spa services, as well as conference facilities.",
-        "location": "Colombo 07, Sri Lanka", 
+        "location": "Colombo 07, Sri Lanka",
         "rating": 4.9,
         "amenities": ["Rooftop Pool", "Spa", "Gym", "Conference Facilities", "Restaurant", "Rooftop Bar"],
         "policies": [
             "Check-in: 3:00 PM",
             "Check-out: 11:00 AM",
-            "No pets allowed", 
+            "No pets allowed",
             "Non-smoking rooms"
         ],
         "roomTypes": ["studio", "super_deluxe"],
@@ -53,7 +51,8 @@ hotels_data = {
         "description": "Set amidst the misty hills of Kandy, Gardeo Kandy Hills offers breathtaking views of the surrounding mountains. This heritage property combines traditional Sri Lankan architecture with modern luxury, featuring an infinity pool overlooking the valley, authentic local cuisine, and a wellness center.",
         "location": "Kandy, Sri Lanka",
         "rating": 4.7,
-        "amenities": ["Infinity Pool", "Wellness Center", "Heritage Restaurant", "Tea Lounge", "Mountain Biking", "Cultural Tours"],
+        "amenities": ["Infinity Pool", "Wellness Center", "Heritage Restaurant", "Tea Lounge", "Mountain Biking",
+                      "Cultural Tours"],
         "policies": [
             "Check-in: 2:00 PM",
             "Check-out: 11:00 AM",
@@ -70,7 +69,7 @@ hotels_data = {
         "rating": 4.8,
         "amenities": ["Private Beach", "Water Sports", "Beachfront Dining", "Luxury Spa", "Infinity Pool", "Kids Club"],
         "policies": [
-            "Check-in: 2:00 PM", 
+            "Check-in: 2:00 PM",
             "Check-out: 12:00 PM",
             "No pets allowed",
             "Non-smoking rooms"
@@ -81,10 +80,14 @@ hotels_data = {
 }
 
 room_type_data = {
-    "deluxe": {"description": "The spacious rooms are defined by king size beds commanding a modern yet minimal ambience, with amenities set in minimalist contours of elegance and efficiency with all the creature comforts a traveler needs."},
-    "super_deluxe": {"description": "The super deluxe rooms are defined by king size beds commanding a modern yet minimal ambience, with a bathtub and amenities set in minimalist contours of elegance and efficiency with all the creature comforts a traveler needs."},
-    "studio": {"description": "The 1 bedroom serviced apartments spacious living areas as well as a kitchen housing a cooker, fridge, washing machine and microwave. Rooms are defined by king size beds commanding a modern yet minimal ambience, with amenities set in minimalist contours of elegance and efficiency with all the creature comforts a traveller needs."},
-    "standard": {"description": "The standard rooms are defined by king size beds commanding a modern yet minimal ambience, with amenities set in minimalist contours of elegance and efficiency with all the creature comforts a traveler needs."}
+    "deluxe": {
+        "description": "The spacious rooms are defined by king size beds commanding a modern yet minimal ambience, with amenities set in minimalist contours of elegance and efficiency with all the creature comforts a traveler needs."},
+    "super_deluxe": {
+        "description": "The super deluxe rooms are defined by king size beds commanding a modern yet minimal ambience, with a bathtub and amenities set in minimalist contours of elegance and efficiency with all the creature comforts a traveler needs."},
+    "studio": {
+        "description": "The 1 bedroom serviced apartments spacious living areas as well as a kitchen housing a cooker, fridge, washing machine and microwave. Rooms are defined by king size beds commanding a modern yet minimal ambience, with amenities set in minimalist contours of elegance and efficiency with all the creature comforts a traveller needs."},
+    "standard": {
+        "description": "The standard rooms are defined by king size beds commanding a modern yet minimal ambience, with amenities set in minimalist contours of elegance and efficiency with all the creature comforts a traveler needs."}
 }
 
 rooms_data = {
@@ -99,7 +102,7 @@ rooms_data = {
             "is_available": True
         },
         102: {
-            "room_number": "102", 
+            "room_number": "102",
             "room_type": "super_deluxe",
             "price_per_night": 149.50,
             "occupancy": 3,
@@ -142,7 +145,7 @@ rooms_data = {
             "price_per_night": 89.99,
             "occupancy": 4,
             "amenities": ["Air Conditioning", "Free WiFi"],
-            "cancellationPolicy": "Free cancellation up to 24 hours before check-in", 
+            "cancellationPolicy": "Free cancellation up to 24 hours before check-in",
             "is_available": True
         }
     },
@@ -190,7 +193,8 @@ rooms_data = {
             "room_type": "super_deluxe",
             "price_per_night": 299.50,
             "occupancy": 3,
-            "amenities": ["Air Conditioning", "Mini Bar", "Free WiFi", "Safe", "Bathtub", "Ocean View", "Private Balcony"],
+            "amenities": ["Air Conditioning", "Mini Bar", "Free WiFi", "Safe", "Bathtub", "Ocean View",
+                          "Private Balcony"],
             "cancellationPolicy": "Free cancellation up to 48 hours before check-in",
             "is_available": True
         },
@@ -232,10 +236,9 @@ user_bookings_data = [
 ]
 last_booking_id = 0
 
+
 @api_router.get("/hotels", response_model=Hotels)
-async def list_hotels(
-    token_data: TokenData = Security(validate_token, scopes=["read_hotels"])
-):
+async def list_hotels():
     return {
         "hotels": [
             HotelBasic(id=hid, **hotel_data)
@@ -243,20 +246,18 @@ async def list_hotels(
         ]
     }
 
+
 @api_router.get("/hotels/{hotel_id}", response_model=Hotel)
-async def get_hotel(
-    hotel_id: int,
-    token_data: TokenData = Security(validate_token, scopes=["read_rooms"])
-):
+async def get_hotel(hotel_id: int):
     if hotel_id not in hotels_data:
         raise HTTPException(status_code=404, detail="Hotel not found")
-    
+
     hotel = hotels_data[hotel_id]
     rooms = [
         Room(id=rid, **room_data)
         for rid, room_data in rooms_data[hotel_id].items()
     ]
-    
+
     return {
         "id": hotel_id,
         "name": hotel["name"],
@@ -269,6 +270,8 @@ async def get_hotel(
         "promotions": hotel["promotions"],
         "rooms": rooms
     }
+
+
 class Room(BaseModel):
     id: int
     room_number: str
@@ -279,21 +282,19 @@ class Room(BaseModel):
     cancellationPolicy: str
     is_available: bool
 
+
 @api_router.get("/rooms/{room_id}", response_model=Room)
-async def get_room_details(
-    room_id: int,
-    token_data: TokenData = Security(validate_token, scopes=["read_rooms"])
-):
+async def get_room_details(room_id: int):
     # Find the hotel that has this room
     room_data = None
     for hotel_rooms in rooms_data.values():
         if room_id in hotel_rooms:
             room_data = hotel_rooms[room_id]
             break
-    
+
     if not room_data:
         raise HTTPException(status_code=404, detail="Room not found")
-    
+
     return {
         "id": room_id,
         "room_number": room_data["room_number"],
@@ -305,21 +306,19 @@ async def get_room_details(
         "is_available": room_data["is_available"]
     }
 
+
 @api_router.post("/bookings", response_model=Booking)
-async def book_room(
-    booking: BookingCreate,
-    token_data: TokenData = Security(validate_token, scopes=["create_bookings"])
-):
+async def book_room(booking: BookingCreate):
     global last_booking_id
-    
+
     # Validate hotel exists
     if booking.hotel_id not in hotels_data:
         raise HTTPException(status_code=404, detail="Hotel not found")
-    
+
     # Validate room exists
     if booking.room_id not in rooms_data.get(booking.hotel_id, {}):
         raise HTTPException(status_code=404, detail="Room not found")
-    
+
     # # Check if room is available for the dates
     # for existing_booking in bookings_data.values():
     #     if (existing_booking["hotel_id"] == booking.hotel_id and 
@@ -327,15 +326,15 @@ async def book_room(
     #         not (booking.check_out <= existing_booking["check_in"] or 
     #              booking.check_in >= existing_booking["check_out"])):
     #         raise HTTPException(status_code=400, detail="Room not available for these dates")
-    
+
     # Get hotel and room data
     hotel = hotels_data[booking.hotel_id]
     room = rooms_data[booking.hotel_id][booking.room_id]
-    
+
     # Calculate total price
     days = (booking.check_out - booking.check_in).days
     total_price = room["price_per_night"] * days
-    
+
     # Create booking
     last_booking_id += 1
     bookings_data[last_booking_id] = {
@@ -349,23 +348,19 @@ async def book_room(
         "check_out": booking.check_out,
         "total_price": total_price
     }
-    
+
     return Booking(**bookings_data[last_booking_id])
 
+
 @api_router.get("/bookings/{booking_id}", response_model=Booking)
-async def get_booking_details(
-    booking_id: int,
-    token_data: TokenData = Security(validate_token, scopes=["read_bookings"])
-):
+async def get_booking_details(booking_id: int):
     if booking_id not in bookings_data:
         raise HTTPException(status_code=404, detail="Booking not found")
     return Booking(**bookings_data[booking_id])
 
+
 @api_router.post("/bookings/preview", response_model=BookingPreview)
-async def get_booking_preview(
-    booking_preview_request: BookingPreviewRequest,
-    token_data: TokenData = Security(validate_token, scopes=["read_rooms"])
-):
+async def get_booking_preview(booking_preview_request: BookingPreviewRequest):
     room_id = booking_preview_request.room_id
     check_in = booking_preview_request.check_in
     check_out = booking_preview_request.check_out
@@ -378,10 +373,10 @@ async def get_booking_preview(
             hotel_id = hid
             room_data = rooms[room_id]
             break
-    
+
     if not room_data:
         raise HTTPException(status_code=404, detail="Room not found")
-    
+
     # Check room availability
     is_available = True
     # for booking in bookings_data.values():  # Fix: iterate over values
@@ -390,15 +385,15 @@ async def get_booking_preview(
     #         not (check_out <= booking["check_in"] or check_in >= booking["check_out"])):
     #         is_available = False
     #         break
-    
+
     # Calculate total price
     days = (check_out - check_in).days
     total_price = room_data["price_per_night"] * days
-    
+
     # Get hotel and room type details
     hotel = hotels_data[hotel_id]
     room_type_details = room_type_data[room_data["room_type"]]
-    
+
     return {
         "room_id": room_id,
         "room_number": room_data["room_number"],
@@ -417,23 +412,19 @@ async def get_booking_preview(
 
 
 @api_router.get("/users/{user_id}/bookings", response_model=List[Booking])
-async def get_user_bookings(
-    user_id: str,
-    token_data: TokenData = Security(validate_token, scopes=["read_bookings"])
-):
+async def get_user_bookings(user_id: str):
     return [
         Booking(**booking)
         for booking in user_bookings_data
         if booking["user_id"] == user_id
     ]
 
+
 @api_router.get("/users/{user_id}/loyalty", response_model=UserLoyalty)
-async def get_user_loyalty(
-    user_id: int,
-    token_data: TokenData = Security(validate_token, scopes=["read_loyalty"])
-):
+async def get_user_loyalty(user_id: int):
     # Return mock loyalty data
     return {"user_id": user_id, "loyalty_points": 1200}
+
 
 # Include the router in the main app
 app.include_router(api_router)
