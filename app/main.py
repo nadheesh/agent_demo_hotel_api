@@ -1,13 +1,11 @@
 from fastapi import APIRouter
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt
 
 from .schema import *
 
 app = FastAPI()
-security = HTTPBearer()
 
 api_router = APIRouter(prefix="/api")
 
@@ -242,16 +240,6 @@ user_bookings_data = [
 last_booking_id = 0
 
 
-def get_jwt_claims(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    token = credentials.credentials
-    # No need to verify signature if upstream has done it
-    try:
-        claims = jwt.get_unverified_claims(token)
-        return claims
-    except Exception:
-        raise HTTPException(status_code=401, detail="Invalid token")
-
-
 @api_router.get("/hotels", response_model=Hotels)
 async def list_hotels():
     return {
@@ -322,10 +310,26 @@ async def get_room_details(room_id: int):
     }
 
 
+async def get_claims(request: Request):
+    jwt_token = request.headers.get("X-JWT-Assertion")
+
+    if not jwt_token:
+        raise HTTPException(status_code=401, detail="Missing JWT Assertion")
+
+    try:
+        # Decode without verification (already done at the Gateway)
+        claims = jwt.get_unverified_claims(jwt_token)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Invalid JWT: {str(e)}")
+
+    return claims
+
+
 @api_router.post("/bookings", response_model=Booking)
-async def book_room(booking: BookingCreate, claims: dict = Depends(get_jwt_claims)):
-    print(claims)
+async def book_room(request: Request, booking: BookingCreate):
     global last_booking_id
+
+    claims = await get_claims(request)
 
     # Validate hotel exists
     if booking.hotel_id not in hotels_data:
