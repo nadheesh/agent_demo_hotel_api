@@ -111,9 +111,6 @@ components:
       properties:
         hotel_id:
           type: integer
-        user_id:
-          type: string
-          format: uuid
         room_id:
           type: integer
         check_in:
@@ -124,7 +121,6 @@ components:
           format: date
       required:
         - hotel_id
-        - user_id
         - room_id
         - check_in
         - check_out
