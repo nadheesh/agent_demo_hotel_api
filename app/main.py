@@ -155,8 +155,8 @@ rooms_data = {
     3: {
         301: {
             "room_number": "301",
-            "room_type": "deluxe",
-            "price_per_night": 179.99,
+            "room_type": "deluxe_mountain_view",
+            "price_per_night": 199.99,
             "occupancy": 2,
             "amenities": ["Air Conditioning", "Mini Bar", "Free WiFi", "Safe", "Mountain View"],
             "cancellationPolicy": "Free cancellation up to 24 hours before check-in",
@@ -173,7 +173,7 @@ rooms_data = {
         },
         303: {
             "room_number": "303",
-            "room_type": "deluxe",
+            "room_type": "deluxe_garden_view",
             "price_per_night": 189.99,
             "occupancy": 2,
             "amenities": ["Air Conditioning", "Mini Bar", "Free WiFi", "Safe", "Garden View"],
@@ -184,8 +184,8 @@ rooms_data = {
     4: {
         401: {
             "room_number": "401",
-            "room_type": "deluxe",
-            "price_per_night": 199.99,
+            "room_type": "deluxe_ocean_view",
+            "price_per_night": 209.99,
             "occupancy": 2,
             "amenities": ["Air Conditioning", "Mini Bar", "Free WiFi", "Safe", "Ocean View"],
             "cancellationPolicy": "Free cancellation up to 24 hours before check-in",
@@ -203,8 +203,8 @@ rooms_data = {
         },
         403: {
             "room_number": "403",
-            "room_type": "deluxe",
-            "price_per_night": 209.99,
+            "room_type": "deluxe_garden_view",
+            "price_per_night": 189.99,
             "occupancy": 2,
             "amenities": ["Air Conditioning", "Mini Bar", "Free WiFi", "Safe", "Garden View"],
             "cancellationPolicy": "Free cancellation up to 24 hours before check-in",
